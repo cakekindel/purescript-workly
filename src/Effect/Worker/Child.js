@@ -1,5 +1,5 @@
 exports.sendMsg_ = function(req) {
-  sendMessage(req);
+  postMessage(req);
 };
 
 exports.onMsg_ = function(runEff, listener) {
