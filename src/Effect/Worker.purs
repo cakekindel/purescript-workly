@@ -4,9 +4,11 @@ import Prelude
 
 import Effect (Effect)
 
---| Type binding for the Worker class, parameterized over
+--| A relpath to a module containing worker code
+newtype ModulePath = ModulePath String
+
+--| Type binding for the `Worker` class, parameterized over
 --| the request and response object types.
 --|
---| Uses JSON (de)serialization for encoding messages across
---| the worker boundary.
+--| [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Worker)
 foreign import data Worker :: Type -> Type -> Type

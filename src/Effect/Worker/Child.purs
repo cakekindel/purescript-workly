@@ -1,18 +1,34 @@
-module Effect.Worker.Child where
+module Effect.Worker.Child ( sendMsg
+                           , onMsg
+                           ) where
 
 import Prelude
 
-import Effect (Effect, unsafePerformEffect)
+import Effect (Effect)
+import Effect.Uncurried ( EffectFn1
+                        , EffectFn2
+                        , runEffectFn1
+                        , runEffectFn2
+                        )
+import Effect.Unsafe (unsafePerformEffect)
 import Effect.Worker
 
---| Internal binding for `global.sendMessage`
-foreign import send :: ∀ req. req -> Effect Unit
+--| Internal binding for the `postMessage` function
+--| available in the global scope of web worker modules.
+--|
+--| [MDN](https://developer.mozilla.org/en-US/docs/Web/API/DedicatedWorkerGlobalScope/postMessage)
+sendMsg :: ∀ req. req -> Effect Unit
+sendMsg = runEffectFn1 sendMsg_
 
---| Internal binding for attaching a listener to `global.onmessage`
-listen :: ∀ res. (res -> Effect Unit) -> Effect Unit
-listen = listen_ unsafePerformEffect
+--| Internal binding for attaching a listener to the `onmessage` property
+--| of the global scope of web worker modules.
+--|
+--| [MDN](https://developer.mozilla.org/en-US/docs/Web/API/DedicatedWorkerGlobalScope/onmessage)
+onMsg :: ∀ res. (res -> Effect Unit) -> Effect Unit
+onMsg = runEffectFn2 onMsg_ $ unsafePerformEffect
 
-foreign import listen_ :: ∀ res
-                        . (Effect Unit -> Unit)
-                       -> (res -> Effect Unit)
-                       -> Effect Unit
+foreign import sendMsg_ :: ∀ req. EffectFn1 req Unit
+
+foreign import onMsg_ :: ∀ res. EffectFn2 (Effect Unit -> Unit)
+                                          (res -> Effect Unit)
+                                          Unit
