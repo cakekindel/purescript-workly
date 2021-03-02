@@ -7,10 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "test:build": "spago -x test.dhall bundle-app --main Test.Main",
-    "test:bundle": "parcel build test/index.html -d dist-test",
-    "pretest": "npm run test:build && npm run test:bundle",
-    "test": "mocha-headless-chrome -f dist-test/index.html"
+    "pretest:start": "spago -x test.dhall bundle-app --main Test.Main",
+    "test:start": "parcel test/index.html",
+    "test": "mocha-headless-chrome -f http://localhost:1234"
   },
   "repository": {
     "type": "git",

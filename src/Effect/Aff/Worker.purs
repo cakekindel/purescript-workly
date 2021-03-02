@@ -4,33 +4,40 @@ import Prelude
 
 import Effect (Effect)
 import Effect.Class (liftEffect)
-import Effect.Aff (Aff, launchAff)
 import Effect.Worker (Worker, onMsg, sendMsg)
-import Effect.Aff.Worker.Chan (Chan, Chans, put, newChan, onChange)
+import Effect.Worker.Child as Child
+import Effect.Aff (Aff, launchAff)
+import Effect.Aff.Worker.Channel as Channel
 import Web.Event.Message (MessageEvent, messageData)
 import Data.Maybe (Maybe(..))
 
-type MessageEventListener d = MessageEvent d -> Effect Unit
-type AttachMessageEventListener d = MessageEventListener d -> Effect Unit
 
-workerChans :: forall dn up. Worker dn up -> Aff (Chans dn up)
-workerChans worker =
+
+parentChannels :: forall dn up. Aff (Channel.Bi dn up)
+parentChannels =
   do
-    down <- mkDownlinkChan (onMsg worker)
-    up   <- newChan
-    let up' = onChange (sendMsg worker) up
-    pure $ {down, up: up'}
+    down <- Channel.uniFromCb (onMsg' $ Child.onMsg)
+    up   <-  Channel.newUni
+    let up' = Channel.onPut (Child.sendMsg) up
+    pure $ Channel.Bi {down, up: up'}
 
-mkDownlinkChan :: forall dn
-                . AttachMessageEventListener dn
-               -> Aff (Chan dn)
-mkDownlinkChan onDn = do
-                        chan <- newChan
-                        liftEffect $
-                          onDn \ev -> case messageData ev of
-                                 Just msg -> do
-                                    _ <- launchAff $ put msg chan
-                                    mempty
-                                 _        -> mempty
-                        pure chan
+workerChannels :: forall dn up. Worker dn up -> Aff (Channel.Bi dn up)
+workerChannels worker =
+  do
+    down <- Channel.uniFromCb (onMsg' $ onMsg worker)
+    up   <- Channel.newUni
+    let up' = Channel.onPut (sendMsg worker) up
+    pure $ Channel.Bi {down, up: up'}
 
+type MsgCb a = MessageEvent a -> Effect Unit
+type AttachMsgCb a = MsgCb a -> Effect Unit
+
+--| Listen for a worker's  `Nothing`
+onMsg' :: ∀ a
+        . AttachMsgCb a
+       -> (a -> Effect Unit)
+       -> Effect Unit
+onMsg' attach cb = attach
+                     \ev -> case messageData ev of
+                       Just msg -> cb msg
+                       Nothing  -> mempty

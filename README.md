@@ -2,22 +2,37 @@
 Simple & Clean PureScript Web Worker API
 
 ## Who can / should use this?
-This should hypothetically be usable in Node or the browser,
-however it was created for `cliply` with modern browsers in mind
-as the primary use-case.
+This should hypothetically be usable in any modern browser,
+I have successfully run the test suite in Firefox 85 and Chrome 83.
 
 ## Running / Developing
-This project uses `spago` for development.
+This project uses `spago` for development, and `npm` for scripts.
+
+#### Setup
+```sh
+npm ci
+```
 
 #### Building
 ```sh
-spago build
+spago -x test.dhall build
 ```
 
 #### Running Tests
+First, in a terminal window build & host the mocha test runner with:
 ```sh
-spago test
+npm run test:start
 ```
+
+Then, run the tests with the UI by visiting `localhost:1234` in your browser,
+or in another terminal run the tests with `mocha-headless-chrome` using:
+```sh
+npm test
+```
+
+#### What is `test.dhall`?
+A spago package configuration with test files and test deps included,
+running `spago -x test.dhall build` will build files in `src` as well as `test`.
 
 ## Contributing
 This repo uses the regular ole fork process:
