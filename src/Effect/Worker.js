@@ -1,5 +1,5 @@
-exports.spawn_ = function(path) {
-  return new Worker(path);
+exports.spawn_ = function(module) {
+  return new Worker(module, {type: 'module'});
 }
 
 exports.sendMsg_ = function(worker, msg) {

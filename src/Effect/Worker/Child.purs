@@ -4,6 +4,7 @@ module Effect.Worker.Child ( sendMsg
 
 import Prelude
 
+import Web.Event.Message (MessageEvent)
 import Effect (Effect)
 import Effect.Uncurried ( EffectFn1
                         , EffectFn2
@@ -24,7 +25,7 @@ sendMsg = runEffectFn1 sendMsg_
 --| of the global scope of web worker modules.
 --|
 --| [MDN](https://developer.mozilla.org/en-US/docs/Web/API/DedicatedWorkerGlobalScope/onmessage)
-onMsg :: ∀ res. (res -> Effect Unit) -> Effect Unit
+onMsg :: ∀ res. (MessageEvent res -> Effect Unit) -> Effect Unit
 onMsg = runEffectFn2 onMsg_ $ unsafePerformEffect
 
 foreign import sendMsg_ :: ∀ req. EffectFn1 req Unit

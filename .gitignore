@@ -1,3 +1,6 @@
+.cache
+dist*
+test-output
 /bower_components/
 /node_modules/
 /.pulp-cache/

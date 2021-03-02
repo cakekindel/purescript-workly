@@ -1,0 +1,31 @@
+{
+  "name": "purescript-workly",
+  "version": "1.0.0",
+  "description": "Simple & Clean PureScript Web Worker API",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test:build": "spago -x test.dhall bundle-app --main Test.Main",
+    "test:bundle": "parcel build test/index.html -d dist-test",
+    "pretest": "npm run test:build && npm run test:bundle",
+    "test": "mocha-headless-chrome -f dist-test/index.html"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/cakekindel/purescript-workly.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/cakekindel/purescript-workly/issues"
+  },
+  "homepage": "https://github.com/cakekindel/purescript-workly#readme",
+  "devDependencies": {
+    "mocha": "^8.3.0",
+    "mocha-headless-chrome": "^3.1.0",
+    "parcel": "^1.12.4",
+    "spago": "^0.19.1"
+  }
+}

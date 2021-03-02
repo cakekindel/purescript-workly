@@ -1,12 +1,12 @@
-{-
-Welcome to a Spago project!
-You can edit this file as you like.
--}
-{ name = "my-project"
+{ name         = "purescript-workly"
 , dependencies = [ "console"
                  , "effect"
                  , "psci-support"
+                 , "maybe"
+                 , "functions"
+                 , "newtype"
+                 , "avar"
                  ]
-, packages = ./packages.dhall
-, sources = [ "src/**/*.purs", "test/**/*.purs" ]
+, packages     = ./packages.dhall
+, sources      = [ "src/**/*.purs" ]
 }
