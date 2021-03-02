@@ -28,6 +28,10 @@ foreign import spawnWorker :: { hello :: Effect HelloWorker
 
 foreign import isWorker :: ∀ a. a -> Boolean
 
+newtype ShowWorker a b = ShowWorker (Worker.Worker a b)
+instance showWorker :: Show (ShowWorker a b) where
+  show _ = "Worker"
+
 main :: Effect Unit
 main =
   let
@@ -43,7 +47,7 @@ main =
         it "should create a new Worker" do
           toAff $ log "(hello) Test.Main" "created empty worker"
           worker <- toAff $ spawnWorker.hello
-          worker `shouldSatisfy` isWorker
+          (ShowWorker worker) `shouldSatisfy` (\(ShowWorker w) -> isWorker w)
 
         it "should be able to use `sendMsg` and `onMsg` for 2-way messaging" do
           let log' = log "(echo_low_level) Test.Main" >>> toAff

@@ -1,7 +1,3 @@
-exports.spawn_ = function(module) {
-  return new Worker(module, {type: 'module'});
-}
-
 exports.sendMsg_ = function(worker, msg) {
   return worker.postMessage(msg);
 }

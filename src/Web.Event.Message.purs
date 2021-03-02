@@ -1,4 +1,4 @@
-module Web.Event.Message where
+module Web.Event.Message (MessageEvent, messageData) where
 
 import Prelude
 import Data.Function.Uncurried (Fn3, runFn3)
@@ -10,6 +10,7 @@ import Data.Maybe (Maybe(..))
 --| [MDN](https://developer.mozilla.org/en-US/docs/Web/API/MessageEvent)
 foreign import data MessageEvent :: Type -> Type
 
+--| Extract the `data` property from a `MessageEvent`
 messageData :: ∀ a. MessageEvent a -> Maybe a
 messageData = (runFn3 data_) Just Nothing
 

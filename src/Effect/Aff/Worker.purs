@@ -1,4 +1,6 @@
-module Effect.Aff.Worker where
+module Effect.Aff.Worker ( parentChannels
+                         , workerChannels
+                         ) where
 
 import Prelude
 
@@ -10,8 +12,6 @@ import Effect.Aff (Aff, launchAff)
 import Effect.Aff.Worker.Channel as Channel
 import Web.Event.Message (MessageEvent, messageData)
 import Data.Maybe (Maybe(..))
-
-
 
 parentChannels :: forall dn up. Aff (Channel.Bi dn up)
 parentChannels =
