@@ -104,20 +104,12 @@ in  upstream
       }
 -------------------------------
 -}
-
 let upstream =
-      https://github.com/purescript/package-sets/releases/download/psc-0.13.8-20210118/packages.dhall sha256:a59c5c93a68d5d066f3815a89f398bcf00e130a51cb185b2da29b20e2d8ae115
+      https://github.com/purescript/package-sets/releases/download/psc-0.14.0-20210313/packages.dhall sha256:ba6368b31902aad206851fec930e89465440ebf5a1fe0391f8be396e2d2f1d87
 
 in  upstream
   with spec-mocha =
-    { dependencies =
-       [ "console"
-       , "foldable-traversable"
-       , "exceptions"
-       , "spec"
-       ]
-    , repo =
-       "https://github.com/purescript-spec/purescript-spec-mocha"
-    , version =
-        "v4.0.0"
+    { dependencies = [ "console", "foldable-traversable", "exceptions", "spec" ]
+    , repo = "https://github.com/purescript-spec/purescript-spec-mocha"
+    , version = "v4.0.0"
     }

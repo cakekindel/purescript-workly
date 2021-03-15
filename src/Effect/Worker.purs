@@ -19,16 +19,10 @@ import Effect.Uncurried ( EffectFn1
 --|
 --| [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Worker)
 foreign import data Worker :: Type -> Type -> Type
-instance showWorker :: Show (Worker req res) where
-  show _ = "Worker"
 
 --| Type of an ECMAScript module containing a `default`
 --| export that is a Worker execution body.
 foreign import data Module :: Type -> Type -> Type
-
---|
-spawn :: ∀ req res. Module req res -> Effect (Worker req res)
-spawn = runEffectFn1 spawn_
 
 --| Internal binding for `Worker#postMessage`
 --|
@@ -36,7 +30,7 @@ spawn = runEffectFn1 spawn_
 --| (by way of `Worker.Child.onMsg`) to fire with this message.
 --|
 --| [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Worker)
-sendMsg :: ∀ req. Worker req _ -> req -> Effect Unit
+sendMsg :: ∀ req res. Worker req res -> req -> Effect Unit
 sendMsg = runEffectFn2 sendMsg_
 
 --| Internal binding for attaching a listener to `Worker#onmessage`.
@@ -44,9 +38,9 @@ sendMsg = runEffectFn2 sendMsg_
 --| Any previously attached listener will be removed.
 --|
 --| [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Worker/onmessage)
-onMsg :: ∀ res. Worker _ res -> (MessageEvent res -> Effect Unit) -> Effect Unit
+onMsg :: ∀ req res. Worker req res -> (MessageEvent res -> Effect Unit) -> Effect Unit
 onMsg = runEffectFn3 onMsg_ $ unsafePerformEffect
 
-foreign import spawn_   :: ∀ req res. EffectFn1 (Module req res) (Worker req res)
-foreign import sendMsg_ :: ∀ req. EffectFn2 (Worker req _) req Unit
-foreign import onMsg_   :: ∀ a res. EffectFn3 (Effect a -> a) (Worker _ res) (MessageEvent res -> Effect Unit) Unit
+foreign import spawn_   :: ∀ req res.   EffectFn1 (Module req res) (Worker req res)
+foreign import sendMsg_ :: ∀ req res.   EffectFn2 (Worker req res) req Unit
+foreign import onMsg_   :: ∀ a req res. EffectFn3 (Effect a -> a) (Worker req res) (MessageEvent res -> Effect Unit) Unit
