@@ -5,7 +5,7 @@ import Prelude
 import Web.Event.Message (messageData)
 import Data.Maybe (maybe)
 import Effect (Effect)
-import Effect.Worker (Worker, Module)
+import Effect.Worker (Worker)
 import Effect.Worker.Child (onMsg, sendMsg)
 import Test.Logging (log)
 
