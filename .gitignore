@@ -1,6 +1,7 @@
 .cache
 dist*
 test-output
+test/Docs/Gen/**
 /bower_components/
 /node_modules/
 /.pulp-cache/

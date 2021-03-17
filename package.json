@@ -9,7 +9,9 @@
   "scripts": {
     "pretest:start": "spago -x test.dhall bundle-app --main Test.Main",
     "test:start": "parcel test/index.html",
-    "test": "mocha-headless-chrome -f http://localhost:1234"
+    "predoctest": "purepur -o test/Docs/Gen --src 'src/**/*.purs' '.spago/*/*/src/**/*.purs' 'src/**/*.purs'",
+    "doctest": "spago -x test.dhall test --main Test.Docs.Main",
+    "test": "npm run doctest && mocha-headless-chrome -f http://localhost:1234"
   },
   "repository": {
     "type": "git",
@@ -22,9 +24,11 @@
   },
   "homepage": "https://github.com/cakekindel/purescript-workly#readme",
   "devDependencies": {
+    "deasync": "^0.1.21",
     "mocha": "^8.3.0",
     "mocha-headless-chrome": "^3.1.0",
     "parcel": "^1.12.4",
+    "purescript-doctest": "^0.1.6",
     "spago": "^0.19.1"
   }
 }
