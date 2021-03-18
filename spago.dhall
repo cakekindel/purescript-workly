@@ -1,4 +1,4 @@
-{ name         = "purescript-workly"
+{ name         = "workly"
 , dependencies = [ "console"
                  , "effect"
                  , "psci-support"
