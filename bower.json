@@ -1,0 +1,25 @@
+{
+    "name": "purescript-purescript-workly",
+    "license": [
+        "Unlicense"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/cakekindel/purescript-workly"
+    },
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "output"
+    ],
+    "dependencies": {
+        "purescript-avar": "^v4.0.0",
+        "purescript-console": "^v5.0.0",
+        "purescript-effect": "^v3.0.0",
+        "purescript-functions": "^v5.0.0",
+        "purescript-maybe": "^v5.0.0",
+        "purescript-newtype": "^v4.0.0",
+        "purescript-psci-support": "^v5.0.0"
+    }
+}
