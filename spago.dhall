@@ -9,4 +9,6 @@
                  ]
 , packages     = ./packages.dhall
 , sources      = [ "src/**/*.purs" ]
+, license      = "Unlicense"
+, repository   = "https://github.com/cakekindel/purescript-workly"
 }
