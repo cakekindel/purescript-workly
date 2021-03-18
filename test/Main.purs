@@ -18,8 +18,8 @@ import Test.Workers.EchoChannels (EchoChannelsWorker)
 
 import Web.Event.Message (messageData)
 import Effect.Worker as Worker
-import Effect.Aff.Worker (workerChannels)
-import Effect.Aff.Worker.Channel as Channel
+import Effect.Aff.Worker.Link (workerLink)
+import Effect.Aff.Link as Link
 
 foreign import spawnWorker :: { hello :: Effect HelloWorker
                               , echo  :: Effect EchoWorker
@@ -66,42 +66,42 @@ main =
           log' $ "received " <> show msg
           msg `shouldEqual` (pure expected)
 
-        it "should be able to use Channels for 2-way messaging in Parent context" do
+        it "should be able to use Link for 2-way messaging in Parent context" do
           let log' = log "(echo_chans) Test.Main" >>> toAff
 
           -- ARRANGE
           worker <- toAff $ spawnWorker.echo
           log' "created echo worker"
 
-          link <- workerChannels worker
+          link <- workerLink worker
 
           -- ACT
           let cases = ["hello!", "hello2!", "wow!"]
           for_ cases \expected -> do
-            Channel.send expected link
+            Link.send expected link
             log' $ "sent " <> show expected
 
             -- ASSERT
-            msg <- Channel.recv link
+            msg <- Link.recv link
             log' $ "received " <> show msg
             msg `shouldEqual` expected
 
-        it "should be able to use Channels for 2-way messaging in Child context" do
+        it "should be able to use Link for 2-way messaging in Child context" do
           let log' = log "(chans_in_worker) Test.Main" >>> toAff
 
           -- ARRANGE
           worker <- toAff $ spawnWorker.chans
           log' "created worker with chans"
 
-          link <- workerChannels worker
+          link <- workerLink worker
 
           -- ACT
           let cases = ["hello!", "hello2!", "wow!"]
           for_ cases \expected -> do
-            Channel.send expected link
+            Link.send expected link
             log' $ "sent " <> show expected
 
             -- ASSERT
-            msg <- Channel.recv link
+            msg <- Link.recv link
             log' $ "received " <> show msg
             msg `shouldEqual` expected

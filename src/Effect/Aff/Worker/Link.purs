@@ -1,6 +1,6 @@
-module Effect.Aff.Worker ( parentChannels
-                         , workerChannels
-                         ) where
+module Effect.Aff.Worker.Link ( parentLink
+                              , workerLink
+                              ) where
 
 import Prelude
 
@@ -9,7 +9,7 @@ import Effect.Class (liftEffect)
 import Effect.Worker (Worker, onMsg, sendMsg)
 import Effect.Worker.Child as Child
 import Effect.Aff (Aff, launchAff)
-import Effect.Aff.Worker.Channel as Channel
+import Effect.Aff.Link as Link
 import Web.Event.Message (MessageEvent, messageData)
 import Data.Maybe (Maybe(..))
 
@@ -24,28 +24,33 @@ import Data.Maybe (Maybe(..))
 --| import Effect.Worker (Worker)
 --| import Effect.Aff (liftAff)
 --| import Effect.Aff.Worker (parentChannels)
---| import Effect.Aff.Worker.Channel (Bi, parentChannels)
+--| import Effect.Aff.Worker.Link as Link
 --| import Control.Monad.Rec.Class (forever)
 --|
 --| data GreetWorker = Worker String String
 --|
 --| main :: Effect Unit
 --| main = liftAff $ forever do
---|   link <- parentChannels :: Aff (Bi String String)
---|   name <- recv link -- wait for parent to send us a name
+--|   link <- parentLink :: Aff (Link.Link String String)
+--|
+--|   -- wait for parent to send us a name
+--|   name <- Link.recv link
+--|
+--|   -- send "hello, name!" to parent thread
 --|   let msg = "Hello, " <> name <> "!"
---|   _ <- send msg link -- send "hello, name!" to parent context
+--|   _ <- Link.send msg link
+--|
+--|   mempty
 --| ```
-parentChannels :: ∀ dn up. Aff (Channel.Bi dn up)
-parentChannels =
+parentLink :: ∀ dn up. Aff (Link.Link dn up)
+parentLink =
   do
-    down <- Channel.uniFromCb (onMsg' $ Child.onMsg)
-    up   <-  Channel.newUni
-    let up' = Channel.onPut (Child.sendMsg) up
-    pure $ Channel.Bi {down, up: up'}
+    down <- Link.newChannelFromCb (onMsg' $ Child.onMsg)
+    up   <-  Link.newChannelHot (Child.sendMsg)
+    pure $ Link.Link {down, up}
 
---| Construct bi-directional channels for
---| a worker to be able to communicate with the parent thread.
+--| Construct a communication link for a Worker,
+--| allowing 2-way communication with a worker thread.
 --|
 --| ```purescript
 --| module Main where
@@ -54,8 +59,8 @@ parentChannels =
 --|
 --| import Effect.Console (log)
 --| import Effect.Aff (liftAff)
---| import Effect.Aff.Worker (parentChannels)
---| import Effect.Aff.Worker.Channel (Bi, parentChannels)
+--| import Effect.Aff.Worker.Link (workerLink)
+--| import Effect.Aff.Link as Link
 --| import Control.Monad.Rec.Class (forever)
 --| import GreetWorker (GreetWorker)
 --|
@@ -64,18 +69,20 @@ parentChannels =
 --| main :: Effect Unit
 --| main = liftAff $ do
 --|   worker <- spawnGreetWorker
---|   link <- workerChannels worker
---|   _ <- send "Harry" link
---|   greeting <- recv link -- wait for greeter to send us a greeting
---|   _ <- liftEffect $ log greeting
+--|   link   <- workerLink worker
+--|
+--|   Link.send "Harry" link
+--|   greeting <- Link.recv link
+--|
+--|   liftEffect $ log greeting
+--|   mempty
 --| ```
-workerChannels :: ∀ dn up. Worker dn up -> Aff (Channel.Bi dn up)
-workerChannels worker =
+workerLink :: ∀ dn up. Worker dn up -> Aff (Link.Link dn up)
+workerLink worker =
   do
-    down <- Channel.uniFromCb (onMsg' $ onMsg worker)
-    up   <- Channel.newUni
-    let up' = Channel.onPut (sendMsg worker) up
-    pure $ Channel.Bi {down, up: up'}
+    down <- Link.newChannelFromCb (onMsg' $ onMsg worker)
+    up   <- Link.newChannelHot (sendMsg worker)
+    pure $ Link.Link {down, up}
 
 type MsgCb a = MessageEvent a -> Effect Unit
 type AttachMsgCb a = MsgCb a -> Effect Unit

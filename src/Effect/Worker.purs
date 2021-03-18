@@ -1,3 +1,5 @@
+--| Module defining the `Worker` type and
+--| a low-level API for interacting with worker threads.
 module Effect.Worker (Worker, sendMsg, onMsg) where
 
 import Prelude
@@ -6,19 +8,21 @@ import Data.Newtype (class Newtype)
 import Web.Event.Message (MessageEvent)
 import Effect (Effect)
 import Effect.Unsafe (unsafePerformEffect)
-import Effect.Uncurried ( EffectFn1
-                        , EffectFn2
+import Effect.Uncurried ( EffectFn2
                         , EffectFn3
-                        , runEffectFn1
                         , runEffectFn2
                         , runEffectFn3
                         )
 
+fn2 = runEffectFn2
+fn3 = runEffectFn3
+
 --| Type binding for the `Worker` class, parameterized over
---| the request and response object types.
+--| the request (`up`) and response (`dn`) object types.
 --|
 --| [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Worker)
 foreign import data Worker :: Type -> Type -> Type
+
 instance showWorker :: Show (Worker up dn) where show _ = "Worker"
 
 --| Low-level binding for `Worker#postMessage`
@@ -30,8 +34,16 @@ instance showWorker :: Show (Worker up dn) where show _ = "Worker"
 --| instead of this low-level API.
 --|
 --| [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Worker)
-sendMsg :: ∀ req res. Worker req res -> req -> Effect Unit
-sendMsg = runEffectFn2 sendMsg_
+--|
+--| ```purescript
+--| import Effect.Worker (Worker, sendMsg)
+--|
+--| worker :: Worker String _
+--|
+--| sendMsg "hello" worker
+--| ```
+sendMsg :: ∀ up dn. Worker up dn -> up -> Effect Unit
+sendMsg = fn2 sendMsg_
 
 --| Low-level binding for attaching a listener to `Worker#onmessage`.
 --|
@@ -41,8 +53,17 @@ sendMsg = runEffectFn2 sendMsg_
 --| instead of this low-level API.
 --|
 --| [MDN](https://developer.mozilla.org/en-US/docs/Web/API/Worker/onmessage)
-onMsg :: ∀ req res. Worker req res -> (MessageEvent res -> Effect Unit) -> Effect Unit
-onMsg = runEffectFn3 onMsg_ $ unsafePerformEffect
+--|
+--| ```purescript
+--| import Effect.Worker (Worker, onMsg)
+--| import Effect.Console (log)
+--|
+--| worker :: Worker _ String
+--|
+--| onMsg (\m -> log m) worker
+--| ```
+onMsg :: ∀ up dn. Worker up dn -> (MessageEvent dn -> Effect Unit) -> Effect Unit
+onMsg = fn3 onMsg_ $ unsafePerformEffect
 
-foreign import sendMsg_ :: ∀ req res.   EffectFn2 (Worker req res) req Unit
-foreign import onMsg_   :: ∀ a req res. EffectFn3 (Effect a -> a) (Worker req res) (MessageEvent res -> Effect Unit) Unit
+foreign import sendMsg_ :: ∀ up dn.   EffectFn2 (Worker up dn) up Unit
+foreign import onMsg_   :: ∀ a up dn. EffectFn3 (Effect a -> a) (Worker up dn) (MessageEvent dn -> Effect Unit) Unit
