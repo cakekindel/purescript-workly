@@ -28,7 +28,7 @@ import Effect.Unsafe (unsafePerformEffect)
 --|
 --| sendMsg "hello" worker
 --| ```
-sendMsg :: ∀ req. req -> Effect Unit
+sendMsg :: ∀ up. up -> Effect Unit
 sendMsg = runEffectFn1 sendMsg_
 
 --| Internal binding for attaching a listener to the `onmessage` property
@@ -43,8 +43,8 @@ sendMsg = runEffectFn1 sendMsg_
 --|
 --| onMsg (\(m :: String) -> log m) worker
 --| ```
-onMsg :: ∀ res. (MessageEvent res -> Effect Unit) -> Effect Unit
+onMsg :: ∀ dn. (MessageEvent dn -> Effect Unit) -> Effect Unit
 onMsg = runEffectFn2 onMsg_ $ unsafePerformEffect
 
-foreign import sendMsg_ :: ∀ req. EffectFn1 req Unit
-foreign import onMsg_ :: ∀ a res. EffectFn2 (Effect a -> a) (res -> Effect Unit) Unit
+foreign import sendMsg_ :: ∀ up. EffectFn1 up Unit
+foreign import onMsg_ :: ∀ a dn. EffectFn2 (Effect a -> a) (dn -> Effect Unit) Unit
